@@ -6,6 +6,8 @@
 <meta name="theme-color" content="#FF6B35">
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Cache-Control" content="no-store">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="icon.png">
 <title>正在返回猿音…</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; }
@@ -28,18 +30,13 @@
     padding: 40px 28px;
   }
   .logo {
-    width: 64px;
-    height: 64px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, #FF6B35, #F7931E);
+    width: 88px;
+    height: 88px;
+    border-radius: 22px;
     margin: 0 auto 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    font-weight: 700;
-    color: #fff;
-    box-shadow: 0 8px 24px rgba(255, 107, 53, 0.35);
+    display: block;
+    box-shadow: 0 12px 32px rgba(255, 107, 53, 0.35);
+    background: #2a1810;
   }
   h1 {
     font-size: 20px;
@@ -97,7 +94,7 @@
 </head>
 <body>
   <main class="card">
-    <div class="logo" aria-hidden="true">猿</div>
+    <img class="logo" src="icon.png" alt="猿音" width="88" height="88">
     <h1 id="title">正在返回猿音…</h1>
     <p id="subtitle">如果未自动跳转，请点击下方按钮</p>
     <div class="spinner" id="spinner" aria-hidden="true"></div>
