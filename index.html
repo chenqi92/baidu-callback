@@ -59,7 +59,23 @@
     border-radius: 50%;
     animation: spin 0.9s linear infinite;
   }
+  .spinner[hidden] { display: none; }
   @keyframes spin { to { transform: rotate(360deg); } }
+  .check {
+    width: 56px;
+    height: 56px;
+    margin: 8px auto 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #34c759, #2eb852);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(52, 199, 89, 0.35);
+    animation: pop 0.3s ease-out;
+  }
+  .check[hidden] { display: none; }
+  .check svg { width: 28px; height: 28px; stroke: #fff; stroke-width: 3.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  @keyframes pop { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
   .btn {
     display: inline-block;
     padding: 12px 28px;
@@ -98,15 +114,57 @@
     <h1 id="title">正在返回猿音…</h1>
     <p id="subtitle">如果未自动跳转，请点击下方按钮</p>
     <div class="spinner" id="spinner" aria-hidden="true"></div>
+    <div class="check" id="check" aria-hidden="true" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="4 12.5 10 18 20 7"></polyline></svg>
+    </div>
     <a id="manualBtn" class="btn" href="#" hidden>打开猿音</a>
     <div id="errorBox" class="error" hidden></div>
-    <p class="hint">本页面仅用于百度网盘授权回调，不收集任何信息。</p>
+    <p class="hint" id="hint">本页面仅用于百度网盘授权回调，不收集任何信息。</p>
   </main>
 <script>
 (function () {
   "use strict";
 
   var APP_SCHEME = "primuse://baidu/callback";
+
+  // 浏览器语言检测：以 zh 开头走中文，其它一律英文。
+  // 仅本页文案用，App 内文案与服务端无关。
+  var lang = (navigator.language || navigator.userLanguage || "zh").toLowerCase();
+  var isZh = lang.indexOf("zh") === 0;
+  var T = isZh ? {
+    titleReturning: "正在返回猿音…",
+    subtitleReturning: "如果未自动跳转，请点击下方按钮",
+    titleSuccess: "授权成功",
+    subtitleSuccess: "已通知猿音完成授权，您可以关闭此页面。",
+    titleError: "授权未完成",
+    subtitleError: "请回到猿音重试，或点击下方按钮再试一次。",
+    btnOpen: "打开猿音",
+    btnReturn: "返回猿音",
+    btnClose: "关闭此页面",
+    hint: "本页面仅用于百度网盘授权回调，不收集任何信息。",
+    errMissingCode: "URL 中没有授权码（缺少 code 参数）。请确认百度网盘开放平台的回调地址配置正确。",
+    closeFallback: "请手动关闭此窗口或标签页。",
+  } : {
+    titleReturning: "Returning to Primuse…",
+    subtitleReturning: "If you are not redirected automatically, tap the button below.",
+    titleSuccess: "Authorization Successful",
+    subtitleSuccess: "Primuse has been notified. You can close this page now.",
+    titleError: "Authorization Failed",
+    subtitleError: "Please return to Primuse and try again, or tap the button below to retry.",
+    btnOpen: "Open Primuse",
+    btnReturn: "Back to Primuse",
+    btnClose: "Close This Page",
+    hint: "This page is used only for Baidu Netdisk OAuth callback. No data is collected.",
+    errMissingCode: "Missing authorization code in the URL (no `code` parameter). Please verify the redirect URI registered on Baidu Open Platform.",
+    closeFallback: "Please close this window or tab manually.",
+  };
+
+  // 把页面初始文案换成对应语言（默认 HTML 是中文，英文环境下覆盖）。
+  document.documentElement.lang = isZh ? "zh-CN" : "en";
+  document.title = T.titleReturning;
+  document.getElementById("title").textContent = T.titleReturning;
+  document.getElementById("subtitle").textContent = T.subtitleReturning;
+  document.getElementById("hint").textContent = T.hint;
 
   function readParams() {
     // 百度部分流程把 token 放在 fragment 里（implicit grant），
@@ -140,11 +198,45 @@
 
   function showError(msg) {
     document.getElementById("spinner").hidden = true;
-    document.getElementById("title").textContent = "授权未完成";
-    document.getElementById("subtitle").textContent = "请回到猿音重试，或点击下方按钮再试一次。";
+    document.getElementById("check").hidden = true;
+    document.title = T.titleError;
+    document.getElementById("title").textContent = T.titleError;
+    document.getElementById("subtitle").textContent = T.subtitleError;
     var box = document.getElementById("errorBox");
     box.textContent = msg;
     box.hidden = false;
+  }
+
+  // iOS 上 ASWebAuthenticationSession 检测到自定义 scheme 会立即销毁
+  // 这个页面，所以用户基本看不到。但 macOS（含 Mac Catalyst）上回调
+  // 页是在系统默认浏览器里打开的，触发 primuse:// 跳转后浏览器窗口/
+  // 标签页不会自动关闭——用户会一直停留在转圈状态，体验上像是"卡住了"。
+  // 这里在跳转之后短暂等待一下，如果页面没被销毁，就切到"授权成功，
+  // 可关闭"状态，并给一个尝试 window.close() 的按钮兜底。
+  function showSuccess() {
+    document.getElementById("spinner").hidden = true;
+    var check = document.getElementById("check");
+    check.hidden = false;
+    document.title = T.titleSuccess;
+    document.getElementById("title").textContent = T.titleSuccess;
+    document.getElementById("subtitle").textContent = T.subtitleSuccess;
+    var btn = document.getElementById("manualBtn");
+    btn.textContent = T.btnClose;
+    btn.href = "#";
+    btn.hidden = false;
+    btn.onclick = function (e) {
+      e.preventDefault();
+      // window.close() 仅在脚本打开的窗口里有效；普通标签页里直接调
+      // 用是无效的（不会报错也不会关闭），这种情况下提示用户手动关闭。
+      try { window.close(); } catch (err) {}
+      setTimeout(function () {
+        if (!window.closed) {
+          var hint = document.getElementById("hint");
+          hint.textContent = T.closeFallback;
+          hint.style.color = "#FF6B35";
+        }
+      }, 150);
+    };
   }
 
   var params = readParams();
@@ -155,20 +247,21 @@
     var errURL = buildAppURL(params);
     var btn = document.getElementById("manualBtn");
     btn.href = errURL;
-    btn.textContent = "返回猿音";
+    btn.textContent = T.btnReturn;
     btn.hidden = false;
     setTimeout(function () { window.location.replace(errURL); }, 200);
     return;
   }
 
   if (!params.code && !params.access_token) {
-    showError("URL 中没有授权码（缺少 code 参数）。请确认百度网盘开放平台的回调地址配置正确。");
+    showError(T.errMissingCode);
     return;
   }
 
   var appURL = buildAppURL(params);
   var btn = document.getElementById("manualBtn");
   btn.href = appURL;
+  btn.textContent = T.btnOpen;
   btn.hidden = false;
 
   // 先延迟一帧让按钮可见，再触发跳转 ——
@@ -177,6 +270,10 @@
   setTimeout(function () {
     window.location.replace(appURL);
   }, 50);
+
+  // 1.2s 后页面如果还活着，说明回调页是在普通浏览器里打开的（macOS
+  // 走的就是这条路径），这时切到"授权成功"提示并允许用户关闭页面。
+  setTimeout(showSuccess, 1200);
 })();
 </script>
 </body>
