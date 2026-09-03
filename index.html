@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -8,7 +8,7 @@
 <meta http-equiv="Cache-Control" content="no-store">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="icon.png">
-<title>正在返回猿音…</title>
+<title>Returning to Primuse…</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; height: 100%; }
@@ -110,16 +110,16 @@
 </head>
 <body>
   <main class="card">
-    <img class="logo" src="icon.png" alt="猿音" width="88" height="88">
-    <h1 id="title">正在返回猿音…</h1>
-    <p id="subtitle">如果未自动跳转，请点击下方按钮</p>
+    <img class="logo" src="icon.png" alt="Primuse" width="88" height="88">
+    <h1 id="title">Returning to Primuse…</h1>
+    <p id="subtitle">If you are not redirected automatically, tap the button below.</p>
     <div class="spinner" id="spinner" aria-hidden="true"></div>
     <div class="check" id="check" aria-hidden="true" hidden>
       <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="4 12.5 10 18 20 7"></polyline></svg>
     </div>
-    <a id="manualBtn" class="btn" href="#" hidden>打开猿音</a>
+    <a id="manualBtn" class="btn" href="#" hidden>Open Primuse</a>
     <div id="errorBox" class="error" hidden></div>
-    <p class="hint" id="hint">本页面仅用于百度网盘授权回调，不收集任何信息。</p>
+    <p class="hint" id="hint">This page is used only for the Baidu Netdisk OAuth callback. No data is collected.</p>
   </main>
 <script>
 (function () {
@@ -127,40 +127,87 @@
 
   var APP_SCHEME = "primuse://baidu/callback";
 
-  // 浏览器语言检测：以 zh 开头走中文，其它一律英文。
-  // 仅本页文案用，App 内文案与服务端无关。
-  var lang = (navigator.language || navigator.userLanguage || "zh").toLowerCase();
-  var isZh = lang.indexOf("zh") === 0;
-  var T = isZh ? {
-    titleReturning: "正在返回猿音…",
-    subtitleReturning: "如果未自动跳转，请点击下方按钮",
-    titleSuccess: "授权成功",
-    subtitleSuccess: "已通知猿音完成授权，您可以关闭此页面。",
-    titleError: "授权未完成",
-    subtitleError: "请回到猿音重试，或点击下方按钮再试一次。",
-    btnOpen: "打开猿音",
-    btnReturn: "返回猿音",
-    btnClose: "关闭此页面",
-    hint: "本页面仅用于百度网盘授权回调，不收集任何信息。",
-    errMissingCode: "URL 中没有授权码（缺少 code 参数）。请确认百度网盘开放平台的回调地址配置正确。",
-    closeFallback: "请手动关闭此窗口或标签页。",
-  } : {
-    titleReturning: "Returning to Primuse…",
-    subtitleReturning: "If you are not redirected automatically, tap the button below.",
-    titleSuccess: "Authorization Successful",
-    subtitleSuccess: "Primuse has been notified. You can close this page now.",
-    titleError: "Authorization Failed",
-    subtitleError: "Please return to Primuse and try again, or tap the button below to retry.",
-    btnOpen: "Open Primuse",
-    btnReturn: "Back to Primuse",
-    btnClose: "Close This Page",
-    hint: "This page is used only for Baidu Netdisk OAuth callback. No data is collected.",
-    errMissingCode: "Missing authorization code in the URL (no `code` parameter). Please verify the redirect URI registered on Baidu Open Platform.",
-    closeFallback: "Please close this window or tab manually.",
+  var translations = {
+    en: {
+      titleReturning: "Returning to Primuse…", subtitleReturning: "If you are not redirected automatically, tap the button below.",
+      titleSuccess: "Authorization Successful", subtitleSuccess: "Primuse has been notified. You can close this page now.",
+      titleError: "Authorization Failed", subtitleError: "Please return to Primuse and try again, or tap the button below to retry.",
+      btnOpen: "Open Primuse", btnReturn: "Back to Primuse", btnClose: "Close This Page",
+      hint: "This page is used only for the Baidu Netdisk OAuth callback. No data is collected.",
+      errMissingCode: "The URL does not contain an authorization code. Verify the redirect URI registered on the Baidu Open Platform.",
+      closeFallback: "Please close this window or tab manually."
+    },
+    de: {
+      titleReturning: "Zurück zu Primuse…", subtitleReturning: "Wenn du nicht automatisch weitergeleitet wirst, tippe auf die Schaltfläche unten.",
+      titleSuccess: "Autorisierung erfolgreich", subtitleSuccess: "Primuse wurde benachrichtigt. Du kannst diese Seite jetzt schließen.",
+      titleError: "Autorisierung nicht abgeschlossen", subtitleError: "Kehre zu Primuse zurück und versuche es erneut oder tippe unten auf die Schaltfläche.",
+      btnOpen: "Primuse öffnen", btnReturn: "Zurück zu Primuse", btnClose: "Seite schließen",
+      hint: "Diese Seite wird nur für den OAuth-Rückruf von Baidu Netdisk verwendet. Es werden keine Daten erfasst.",
+      errMissingCode: "Die URL enthält keinen Autorisierungscode. Prüfe die auf der Baidu Open Platform registrierte Weiterleitungs-URI.",
+      closeFallback: "Bitte schließe dieses Fenster oder diesen Tab manuell."
+    },
+    fr: {
+      titleReturning: "Retour à Primuse…", subtitleReturning: "Si vous n’êtes pas redirigé automatiquement, touchez le bouton ci-dessous.",
+      titleSuccess: "Autorisation réussie", subtitleSuccess: "Primuse a été informé. Vous pouvez maintenant fermer cette page.",
+      titleError: "Autorisation inachevée", subtitleError: "Revenez dans Primuse et réessayez, ou touchez le bouton ci-dessous.",
+      btnOpen: "Ouvrir Primuse", btnReturn: "Retour à Primuse", btnClose: "Fermer cette page",
+      hint: "Cette page sert uniquement au retour OAuth de Baidu Netdisk. Aucune donnée n’est collectée.",
+      errMissingCode: "L’URL ne contient aucun code d’autorisation. Vérifiez l’URI de redirection enregistrée sur la Baidu Open Platform.",
+      closeFallback: "Fermez manuellement cette fenêtre ou cet onglet."
+    },
+    ja: {
+      titleReturning: "Primuse に戻っています…", subtitleReturning: "自動的に移動しない場合は、下のボタンをタップしてください。",
+      titleSuccess: "認証が完了しました", subtitleSuccess: "Primuse に認証結果を通知しました。このページを閉じることができます。",
+      titleError: "認証が完了しませんでした", subtitleError: "Primuse に戻って再試行するか、下のボタンをタップしてください。",
+      btnOpen: "Primuse を開く", btnReturn: "Primuse に戻る", btnClose: "このページを閉じる",
+      hint: "このページは Baidu Netdisk の OAuth コールバック専用です。データは収集しません。",
+      errMissingCode: "URL に認証コードがありません。Baidu Open Platform に登録したリダイレクト URI を確認してください。",
+      closeFallback: "このウインドウまたはタブを手動で閉じてください。"
+    },
+    ko: {
+      titleReturning: "Primuse로 돌아가는 중…", subtitleReturning: "자동으로 이동하지 않으면 아래 버튼을 탭하세요.",
+      titleSuccess: "인증 완료", subtitleSuccess: "Primuse에 인증 결과를 알렸습니다. 이제 이 페이지를 닫아도 됩니다.",
+      titleError: "인증이 완료되지 않음", subtitleError: "Primuse로 돌아가 다시 시도하거나 아래 버튼을 탭하세요.",
+      btnOpen: "Primuse 열기", btnReturn: "Primuse로 돌아가기", btnClose: "이 페이지 닫기",
+      hint: "이 페이지는 Baidu Netdisk OAuth 콜백에만 사용되며 데이터를 수집하지 않습니다.",
+      errMissingCode: "URL에 인증 코드가 없습니다. Baidu Open Platform에 등록한 리디렉션 URI를 확인하세요.",
+      closeFallback: "이 창이나 탭을 직접 닫아 주세요."
+    },
+    "zh-Hans": {
+      titleReturning: "正在返回 Primuse…", subtitleReturning: "如果未自动跳转，请点击下方按钮。",
+      titleSuccess: "授权成功", subtitleSuccess: "已通知 Primuse 完成授权，您可以关闭此页面。",
+      titleError: "授权未完成", subtitleError: "请回到 Primuse 重试，或点击下方按钮再试一次。",
+      btnOpen: "打开 Primuse", btnReturn: "返回 Primuse", btnClose: "关闭此页面",
+      hint: "本页面仅用于百度网盘授权回调，不收集任何信息。",
+      errMissingCode: "URL 中没有授权码。请确认百度网盘开放平台登记的回调地址正确。",
+      closeFallback: "请手动关闭此窗口或标签页。"
+    },
+    "zh-Hant": {
+      titleReturning: "正在返回 Primuse…", subtitleReturning: "如果未自動跳轉，請點擊下方按鈕。",
+      titleSuccess: "授權成功", subtitleSuccess: "已通知 Primuse 完成授權，您可以關閉此頁面。",
+      titleError: "授權未完成", subtitleError: "請回到 Primuse 重試，或點擊下方按鈕再試一次。",
+      btnOpen: "開啟 Primuse", btnReturn: "返回 Primuse", btnClose: "關閉此頁面",
+      hint: "本頁面僅用於百度網盤授權回呼，不會收集任何資訊。",
+      errMissingCode: "URL 中沒有授權碼。請確認百度網盤開放平台登記的重新導向 URI 正確。",
+      closeFallback: "請手動關閉此視窗或分頁。"
+    }
   };
 
-  // 把页面初始文案换成对应语言（默认 HTML 是中文，英文环境下覆盖）。
-  document.documentElement.lang = isZh ? "zh-CN" : "en";
+  function resolveLocale() {
+    var requested = new URLSearchParams(window.location.search).get("lang");
+    var candidates = requested ? [requested] : (navigator.languages || [navigator.language || navigator.userLanguage || "en"]);
+    for (var i = 0; i < candidates.length; i += 1) {
+      var tag = String(candidates[i]).replace(/_/g, "-").toLowerCase();
+      if (tag.indexOf("zh") === 0) return /(?:^|-)hant(?:-|$)|(?:^|-)(?:tw|hk|mo)(?:-|$)/.test(tag) ? "zh-Hant" : "zh-Hans";
+      var base = tag.split("-")[0];
+      if (translations[base]) return base;
+    }
+    return "en";
+  }
+
+  var locale = resolveLocale();
+  var T = translations[locale];
+  document.documentElement.lang = locale === "zh-Hans" ? "zh-CN" : (locale === "zh-Hant" ? "zh-TW" : locale);
   document.title = T.titleReturning;
   document.getElementById("title").textContent = T.titleReturning;
   document.getElementById("subtitle").textContent = T.subtitleReturning;
